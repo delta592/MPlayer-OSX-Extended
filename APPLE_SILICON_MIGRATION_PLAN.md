@@ -558,10 +558,10 @@ xcodebuild -configuration Release ARCHS=arm64
 - [x] Update example.mpBinaries Info.plist with arm64 architecture
 
 ### Dependencies
-- [ ] Rebuild MPlayer/FFmpeg for arm64
+- [ ] Rebuild MPlayer/FFmpeg for arm64 (currently using stub binary)
 - [ ] Rebuild Fontconfig for arm64
-- [ ] Rebuild Freetype for arm64
-- [ ] Verify/update Sparkle framework
+- [x] Rebuild Freetype for arm64
+- [x] Verify/update Sparkle framework
 
 ### Documentation
 - [x] Update README.md with requirements
@@ -569,10 +569,10 @@ xcodebuild -configuration Release ARCHS=arm64
 - [x] Update changelog
 
 ### Testing
-- [ ] Build verification (file/lipo commands)
-- [ ] Launch testing on Apple Silicon
-- [ ] Playback testing
-- [ ] Performance validation
+- [x] Build verification (file/lipo commands)
+- [ ] Launch testing on Apple Silicon (requires real MPlayer binary)
+- [ ] Playback testing (requires real MPlayer binary)
+- [ ] Performance validation (requires real MPlayer binary)
 
 ---
 
