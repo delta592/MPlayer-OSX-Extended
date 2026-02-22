@@ -393,38 +393,61 @@ If there's a UI checkbox for "Use 32-bit binary on 64-bit host":
 
 ## 8. Phase 6: Dependencies and Libraries
 
+**Status: Build scripts updated, manual dependency builds required**
+
+The build scripts (`mposx_preparebuild`, `mplayer/build`, `ffmpeg/build`, `mposx_install`) have been updated for arm64 builds. The actual dependencies must be built separately and installed to the build root.
+
 ### 8.1 Rebuild All Dependencies for arm64
 
 #### MPlayer/FFmpeg Core
 ```bash
-# Configure for arm64
-./configure --arch=arm64 --enable-neon ...
-make
+# Configure for arm64 (handled by mplayer/build and ffmpeg/build scripts)
+# The scripts set --arch=arm64 --enable-neon automatically
+./build arm64
 ```
 
 #### Fontconfig
 ```bash
-./configure --host=aarch64-apple-darwin ...
+source mposx_preparebuild arm64
+./configure --host=aarch64-apple-darwin --prefix=$BUILD_ROOT
+make && make install
 ```
 
 #### Freetype
 ```bash
-./configure --host=aarch64-apple-darwin ...
+source mposx_preparebuild arm64
+./configure --host=aarch64-apple-darwin --prefix=$BUILD_ROOT
+make && make install
 ```
 
 ### 8.2 Verify Sparkle Framework
 
 Ensure Sparkle.framework includes arm64:
 ```bash
-lipo -info Sparkle.framework/Sparkle
-# Should show: arm64
+lipo -info frameworks/Sparkle.framework/Sparkle
+# Should show: arm64 (or "arm64 x86_64" for universal)
 ```
 
-If using an old version, update to Sparkle 2.x which supports arm64.
+If using an old version, update to Sparkle 2.x which supports arm64 natively.
+
+**Note:** The project uses a custom Sparkle fork (https://github.com/sttz/Sparkle) for binary bundle updates. This fork needs to be rebuilt for arm64 or replaced with upstream Sparkle 2.x.
 
 ### 8.3 Update Framework Search Paths
 
-In Xcode project, verify framework paths point to arm64-compatible frameworks.
+Framework search paths in the Xcode project are already configured correctly:
+- `frameworks` directory (for Sparkle.framework)
+- `$(PROJECT_DIR)`
+
+Library search paths reference `binaries/mpextended.mpBinaries/Contents/MacOS/lib` for freetype. This path will be populated when the binary bundle is built.
+
+### 8.4 Build Process Summary
+
+1. Set up build environment with `mposx_buildconfig`
+2. Build dependencies (fontconfig, freetype) and install to `$BUILD_ROOT`
+3. Build FFmpeg using `ffmpeg/build arm64`
+4. Build MPlayer using `mplayer/build arm64`
+5. Install binaries using `mposx_install /path/to/binaries`
+6. Place Sparkle.framework (arm64) in `frameworks/` directory
 
 ---
 
@@ -515,10 +538,10 @@ xcodebuild -configuration Release ARCHS=arm64
 - [ ] Verify SDK settings
 
 ### Build Scripts
-- [ ] Update `mposx_preparebuild` - remove x86/ppc flags, add arm64
-- [ ] Update `mplayer/build` - arm64 target only
-- [ ] Rewrite `mposx_install` - remove lipo/universal binary logic
-- [ ] Update `ffmpeg/build` - arm64 only
+- [x] Update `mposx_preparebuild` - remove x86/ppc flags, add arm64
+- [x] Update `mplayer/build` - arm64 target only
+- [x] Rewrite `mposx_install` - remove lipo/universal binary logic
+- [x] Update `ffmpeg/build` - arm64 only
 
 ### Source Code
 - [x] `MPlayerInterface.m` - Remove 64-bit detection, 32-bit forcing
@@ -542,7 +565,7 @@ xcodebuild -configuration Release ARCHS=arm64
 
 ### Documentation
 - [ ] Update README.md with requirements
-- [ ] Update build scripts README
+- [x] Update build scripts README
 - [ ] Update changelog
 
 ### Testing
