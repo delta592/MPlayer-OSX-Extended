@@ -1,6 +1,24 @@
 Changelog
 =========
 
+## Revision 16 (Apple Silicon) ##
+
+-   Major Changes:
+    -   **Apple Silicon (arm64) only**: This release exclusively supports Apple Silicon Macs (M1/M2/M3/M4). Intel Macs are no longer supported.
+    -   Minimum macOS version raised to 11.0 (Big Sur).
+    -   Removed all Intel (x86_64/i386) and PowerPC (ppc/ppc64) code paths.
+    -   Simplified binary architecture - no more universal binaries.
+
+-   Build System:
+    -   Updated all build scripts for arm64-only builds.
+    -   Removed lipo universal binary creation.
+    -   Updated deployment target to macOS 11.0.
+
+-   Code Cleanup:
+    -   Removed x86_64 host detection and 32-bit binary forcing logic.
+    -   Removed MPEUse32bitBinaryon64bit preference.
+    -   Simplified binary compatibility checks for arm64.
+
 ## Revision 14 (9. January 2011): ##
 
 -   Major Changes:

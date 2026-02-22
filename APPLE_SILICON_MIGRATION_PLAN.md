@@ -564,9 +564,9 @@ xcodebuild -configuration Release ARCHS=arm64
 - [ ] Verify/update Sparkle framework
 
 ### Documentation
-- [ ] Update README.md with requirements
+- [x] Update README.md with requirements
 - [x] Update build scripts README
-- [ ] Update changelog
+- [x] Update changelog
 
 ### Testing
 - [ ] Build verification (file/lipo commands)
