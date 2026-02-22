@@ -20,19 +20,19 @@ else
 fi
 
 # LOCAL CONFIG
-target_system="x86_64"
+target_system="arm64"
 
 # **************************************************** #
 # *** OPTION PARSING
 
 usage() {
 cat << EOF
-Usage: source $0 [options] [x86_64|i386|ppc|ppcg3|ub]
+Usage: source $0 [options] [arm64]
 
 General options:
     -h, --help                  display this help
-    
-One of either x86_64, i386, ppc, ppcg3 or ub can be passed to set the target system (default: x86_64).
+
+The target system is arm64 (Apple Silicon).
 Headers and configure flags will be set accordingly.
 EOF
 }
@@ -40,7 +40,7 @@ EOF
 # Parse command line
 while [ -n "$1" ]; do
 	case $1 in
-		x86_64 | i386 | ppc | ppcg3 | ub )	target_system=$1
+		arm64 )								target_system=$1
 											;;
 		-h | --help )		 				usage
 							 				exit
@@ -55,7 +55,7 @@ done
 # *** SET PATHS / FLAGS
 
 # Configure deployment target and SDK
-deployment_target=10.6
+deployment_target=11.0
 sdk_path=$(xcrun --show-sdk-path)
 
 # Make sure pkg-config doesn't interfere
@@ -72,31 +72,11 @@ export LDFLAGS="-mmacosx-version-min=${deployment_target} -isysroot ${sdk_path}"
 export LDFLAGS="$LDFLAGS -Wl,-syslibroot,${sdk_path}"
 export CXXFLAGS="-mmacosx-version-min=${deployment_target} -isysroot ${sdk_path}"
 
-# Intel 64bit platform flags
-if [ $target_system = "x86_64" ]; then
-	export CFLAGS="$CFLAGS -arch x86_64"
-	export LDFLAGS="$LDFLAGS -arch x86_64"
-	export CXXFLAGS="$CXXFLAGS -arch x86_64"
-fi
-
-# Intel platform flags
-if [ $target_system = "i386" ]; then
-	export CFLAGS="$CFLAGS -arch i386"
-	export LDFLAGS="$LDFLAGS -arch i386"
-	export CXXFLAGS="$CXXFLAGS -arch i386"
-fi
-
-# Universal binary platform flags
-if [ "$target_system" = "ub" ]; then
-	export CFLAGS="$CFLAGS -arch x86_64 -arch i386"
-	export LDFLAGS="$LDFLAGS -arch x86_64 -arch i386"
-	export CXXFLAGS="$CXXFLAGS -arch x86_64 -arch i386"
-fi
-
-# Fix for text relocation error on i386
-# See: http://stackoverflow.com/questions/6650178/illegal-text-reloc-to-non-lazy-ptr-error-while-building-in-xcode-4-with-libav-l
-if [ $target_system = "i386" ]; then
-	export LDFLAGS="$LDFLAGS -Wl,-read_only_relocs,suppress"
+# Apple Silicon (arm64) platform flags
+if [ $target_system = "arm64" ]; then
+	export CFLAGS="$CFLAGS -arch arm64"
+	export LDFLAGS="$LDFLAGS -arch arm64"
+	export CXXFLAGS="$CXXFLAGS -arch arm64"
 fi
 
 # Set paths

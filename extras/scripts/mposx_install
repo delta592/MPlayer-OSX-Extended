@@ -34,9 +34,9 @@ General options:
 Header options:
     -s, --shared                install a binary with shared libraries
 	--static					install a static binary
-    
-[directory] will be searched for mplayer.i386 and mplayer.x86_64 and then 
-all necessary steps will be taken to install the binary (and all libraries 
+
+[directory] will be searched for mplayer.arm64 (or mplayer) and then
+all necessary steps will be taken to install the binary (and all libraries
 if --shared is set) into the mplayerosx root.
 EOF
 }
@@ -62,9 +62,17 @@ if [ ! -n "$dir" ]; then
 	dir="."
 fi
 
-if [ ! -f "$dir/mplayer.i386" -o ! -f "$dir/mplayer.x86_64" ]; then
-	echo "mplayer.x86_64 or mplayer.i386 binary not found at '$dir'."
+# Check for arm64 binary
+if [ ! -f "$dir/mplayer.arm64" ] && [ ! -f "$dir/mplayer" ]; then
+	echo "mplayer arm64 binary not found at '$dir'."
 	exit 1
+fi
+
+# Set the binary path
+if [ -f "$dir/mplayer.arm64" ]; then
+	mplayer_binary="$dir/mplayer.arm64"
+else
+	mplayer_binary="$dir/mplayer"
 fi
 
 if [ ! -d "$mplayerosx_path/Binaries" ]; then
@@ -75,34 +83,27 @@ fi
 echo "install binaries from '$dir' to '$mplayerosx_path'..."
 
 # **************************************************** #
-# *** RECREATE MPLAYER BINARY
-
-echo "recreate mplayer.ub..."
-
-# recreate ub from untouched mplayer.i386 mplayer.ub
-# (the install names in mplayer.ub could have been already changed)
-lipo -create "$dir/mplayer.x86_64" "$dir/mplayer.i386" -output "$dir/mplayer.ub"
+# *** PREPARE MPLAYER BINARY
+# (No lipo needed for arm64-only builds)
 
 # **************************************************** #
 # *** STATIC INSTALL
 
 if [ $shared -eq 0 ]; then
-	
+
 	echo "Clean install destination..."
-	
+
 	rm -rf "$mplayerosx_path/Binaries/mpextended.mpBinaries/Contents/MacOS/"*
-	
+
 	echo "Searching $dir for binaries..."
-	
-	# Copy universal binary (mplayer.ub) to mpextended.mpBinaries
-	if [ -f "$dir/mplayer.ub" ]; then
-		cp "$dir/mplayer.ub" "$mplayerosx_path/Binaries/mpextended.mpBinaries/Contents/MacOS/mplayer"
-		echo "mplayer.ub copied to mpextended.mpBinaries/Contents/MacOS/mplayer"
-	fi
-	
+
+	# Copy arm64 binary to mpextended.mpBinaries
+	cp "$mplayer_binary" "$mplayerosx_path/Binaries/mpextended.mpBinaries/Contents/MacOS/mplayer"
+	echo "mplayer arm64 binary copied to mpextended.mpBinaries/Contents/MacOS/mplayer"
+
 	# Touch the folder to make XCode copy the new binaries
 	touch "$mplayerosx_path/Binaries"
-	
+
 	echo "Finished."
 	exit 0
 fi
@@ -125,7 +126,7 @@ echo "gather libraries..."
 mkdir "$dir/lib"
 
 # Gather mplayer dependencies
-for word in `otool -L "$dir/mplayer.ub"`; do
+for word in `otool -L "$mplayer_binary"`; do
 	if echo "$word" | grep -q "$build_root"; then
 		# Copy library to lib folder
 		cp "$word" "$dir/lib"
@@ -157,12 +158,12 @@ for path in ./$dir/lib/*; do
 	lib=`basename $path`
 	
 	echo "... change install name for: $lib"
-	
+
 	# change install path in mplayer
-	install_name_tool -change "$build_root/lib/$lib" "@executable_path/lib/$lib" "$dir/mplayer.ub"
+	install_name_tool -change "$build_root/lib/$lib" "@executable_path/lib/$lib" "$mplayer_binary"
 	# change libraries own id
-	install_name_tool -id "@executable_path/lib/$lib" "$path" 
-	
+	install_name_tool -id "@executable_path/lib/$lib" "$path"
+
 	# change install path in other libraries
 	for path2 in ./$dir/lib/*; do
 		install_name_tool -change "$build_root/lib/$lib" "@executable_path/lib/$lib" "$path2"
@@ -174,8 +175,8 @@ done
 
 echo "stripping..."
 
-strip -x "$dir/mplayer.ub"
-echo "... stripped mplayer.ub"
+strip -x "$mplayer_binary"
+echo "... stripped mplayer binary"
 
 for path in ./$dir/lib/*; do
 	lib=`basename $path`
@@ -189,16 +190,16 @@ done
 echo "installing..."
 
 # copy mplayer binary
-cp "$dir/mplayer.ub" "$binary_container/Contents/MacOS/mplayer"
+cp "$mplayer_binary" "$binary_container/Contents/MacOS/mplayer"
 # copy libraries
 cp -R "$dir/lib" "$binary_container/Contents/MacOS/"
 
-echo "... copied mplayer.ub and lib to mpextended.mpBinaries"
+echo "... copied mplayer binary and lib to mpextended.mpBinaries"
 
 # Try to find SVN revision
 revision=""
-if "$dir/mplayer.ub" |grep "MPlayer SVN-r" > /dev/null; then
-	line=`$dir/mplayer.ub |grep "MPlayer SVN-r"`
+if "$mplayer_binary" |grep "MPlayer SVN-r" > /dev/null; then
+	line=`$mplayer_binary |grep "MPlayer SVN-r"`
 	if [[ "$line" =~ SVN\-r([0-9]+) ]]; then
 		revision="${BASH_REMATCH[1]}"
 	fi

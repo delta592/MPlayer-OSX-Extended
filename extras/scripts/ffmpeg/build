@@ -22,8 +22,8 @@ if [ -f "build.config" ]; then
 else
 	
 	# Load default config
-	target_system="i386"
-	all_targets=( "x86_64" "i386" "ppc" )
+	target_system="arm64"
+	all_targets=( "arm64" )
 	
 	# Build directories
 	build_dirs=( libavutil libavcore libavcodec libavformat libpostproc libswscale ) 
@@ -45,7 +45,7 @@ fi
 # **************************************************** #
 # *** SETUP
 
-targets=( "x86_64" "i386" "ppc" "ppcg3" "all" )
+targets=( "arm64" )
 
 no_clean=0
 no_configure=0
@@ -64,7 +64,7 @@ all_options=""
 
 usage() {
 cat << EOF
-Usage: $0 [options] [x86_64|i386|ppc|ppcg3|all]
+Usage: $0 [options] [arm64]
 
 General options:
     -h, --help                  display this help
@@ -77,14 +77,14 @@ Build options:
 Build steps:
     --no-STEP                   skip STEP in build process
     --STEP-only                 only execute STEP of build process
-    
+
 Available STEPs are:
     clean                       clean build directories ("make clean")
     configure                   configure build ("./configure")
     build                       build FFmpeg ("make")
     install                     install libraries after completion
-    
-One of either i386, ppc or ppcg3 can be passed to set the target system (default: i386).
+
+The target system is arm64 (Apple Silicon, default).
 Headers and configure flags will be set accordingly.
 EOF
 }
@@ -140,15 +140,7 @@ while [ -n "$1" ]; do
 	shift
 done
 
-# Build all arches
-if [ "$target_system" = "all" ]; then
-	
-	for arch in "${all_targets[@]}"; do
-		$0 $arch $all_options || exit $?
-	done
-	
-	exit
-fi
+# Note: "all" target removed - arm64 only build
 
 # Quiet string
 if [ $quiet -eq 1 -o $really_quiet -eq 1 ]; then
@@ -241,18 +233,11 @@ config_opts="$config_opts --disable-decoder=mpeg_xvmc"
 # Enable LLVM
 #config_opts="$config_opts --cc=llvm-gcc"
 
-# Intel platform options
-#if [ "$target_system" = "x86_64" ]; then
-#	config_opts="$config_opts"
-#fi
-# Intel platform options
-if [ "$target_system" = "i386" ]; then
-	config_opts="$config_opts --cc=gcc-4.0"
-#	config_opts="$config_opts --cpu=core2"
-fi
-# PPC platform options
-if [ "$target_system" = "ppc" -o "$target_system" = "ppcg3" ]; then
-	config_opts="$config_opts --arch=ppc"
+# Apple Silicon platform options
+if [ "$target_system" = "arm64" ]; then
+	config_opts="$config_opts --arch=arm64"
+	# Enable NEON optimizations for ARM
+	config_opts="$config_opts --enable-neon"
 fi
 
 # *** DEBUG
@@ -319,37 +304,22 @@ fi
 
 echo -e "\nFINISH...\n"
 
-# Create universal binaries if possible
-if [ -d "libs/i386" -a -d "libs/ppc" -a -d "libs/x86_64" ]; then
-	
-	rm -rf "libs/ub"
-	mkdir -p "libs/ub"
-	
-	for path in `ls libs/i386/*.dylib`; do
-		lib=`basename "$path"`
-		if [ -f "libs/ppc/$lib" -a -f "libs/x86_64/$lib" ]; then
-			lipo -create "libs/x86_64/$lib" "libs/i386/$lib" "libs/ppc/$lib" -output "libs/ub/$lib"
-		fi
-	done
-	
-fi
-
+# Install arm64 libraries directly (no universal binary creation needed)
 if [ $do_install -eq 1 ]; then
-	# Install universal libraries if available
-	if [ -d "libs/ub" ]; then
-	
+	if [ -d "libs/$target_system" ]; then
+
 		# Move lib back and install
 		for dir in "${build_dirs[@]}"; do
-			if [ ! -f "libs/ub/$dir.dylib" ]; then
+			if [ ! -f "libs/$target_system/$dir.dylib" ]; then
 				echo "Missing $dir.dylib for install."
 			else
-				cp "libs/ub/$dir.dylib" "$dir/$dir.dylib"
+				cp "libs/$target_system/$dir.dylib" "$dir/$dir.dylib"
 				cd "$dir"
 				eval "make install $c_output" || exit $?
 				cd ..
 			fi
 		done
-	
+
 	fi
 fi
 
