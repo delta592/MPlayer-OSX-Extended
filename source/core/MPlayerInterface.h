@@ -161,8 +161,7 @@ extern NSString* const MIStatsDroppedFramesKey;
 	NSMutableArray *myCommandsBuffer;
 	int subtitleFileId;
 	NSDictionary *lastMissedSeek;
-	BOOL force32bitBinary;
-	
+
 	NSMutableArray *clients;
 }
 

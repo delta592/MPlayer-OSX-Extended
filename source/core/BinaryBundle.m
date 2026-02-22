@@ -32,7 +32,7 @@
 
 #import "RegexKitLite.h"
 
-static NSString* const checkForArches = @"x86_64,i386,ppc64,ppc";
+static NSString* const checkForArches = @"arm64";
 
 /*  Byte-swaps an executable's header (which consists entirely of four-byte quantities on four-byte boundaries).
  */

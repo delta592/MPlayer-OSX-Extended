@@ -564,8 +564,6 @@
 			<string>ch.sttz.mplayerosx.extended.binaries.officialsvn</string>
 			<string>ch.sttz.mplayerosx.extended.binaries.officialsvnwithmt</string>
 		</array>
-		<key>MPEUse32bitBinaryon64bit</key>
-		<false/>
 		<key>MPEUseYUY2VideoFilter</key>
 		<false/>
 		<key>MPEVideoEqualizerValues</key>
@@ -607,7 +605,6 @@
 		<string>MPEBS2BFilter</string>
 		<string>MPEKaraokeFilter</string>
 		<string>MPESelectedBinary</string>
-		<string>MPEUse32bitBinaryon64bit</string>
 		<string>MPEAdvancedOptions</string>
 		<string>MPEVideoEqualizerEnabled</string>
 		<string>MPEAudioEqualizerEnabled</string>

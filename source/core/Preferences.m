@@ -95,7 +95,6 @@ NSString* const MPESubtitleScale                      = @"MPESubtitleScale";
 NSString* const MPESubtitleTextColor                  = @"MPESubtitleTextColor";
 NSString* const MPETextEncoding                       = @"MPETextEncoding";
 NSString* const MPEUpdateBinaries                     = @"MPEUpdateBinaries";
-NSString* const MPEUse32bitBinaryon64bit              = @"MPEUse32bitBinaryon64bit";
 NSString* const MPEVideoEqualizerValues               = @"MPEVideoEqualizerValues";
 NSString* const MPEVideoEqualizerEnabled              = @"MPEVideoEqualizerEnabled";
 NSString* const MPEWindowOnTop						  = @"MPEWindowOnTop";

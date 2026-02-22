@@ -91,7 +91,8 @@ static NSArray* parseRunLoopModes;
 // video equalizer keys to command mapping
 static NSDictionary *videoEqualizerCommands;
 
-static BOOL is64bitHost					= NO;
+// Apple Silicon is always 64-bit
+static BOOL is64bitHost					= YES;
 
 // Local MovieInfo prefs to observe using KVO
 static NSArray* localPrefsToObserve;
@@ -145,12 +146,8 @@ static NSArray* statusNames;
 				   @"Initializing",
 				   @"Seeking",
 				   nil];
-	
-	// detect 64bit host
-	int is64bit;
-	size_t len = sizeof(is64bit);
-	if (!sysctlbyname("hw.optional.x86_64",&is64bit,&len,NULL,0))
-		is64bitHost = (BOOL)is64bit;
+
+	// Apple Silicon is always 64-bit, no detection needed
 }
 
 /************************************************************************************
@@ -331,14 +328,7 @@ static NSArray* statusNames;
 	if (numberOfThreads > MI_LAVC_MAX_THREADS)
 		numberOfThreads = MI_LAVC_MAX_THREADS;
 	
-	// force using 32bit arch of binary
-	force32bitBinary = NO;
-	if (is64bitHost && [prefs boolForKey:MPEUse32bitBinaryon64bit]) {
-		NSArray *arches = [pc objectForInfoKey:@"MPEBinaryArchs" 
-									  ofBinary:[cPrefs objectForKey:MPESelectedBinary]];
-		if ([arches containsObject:@"i386"])
-			force32bitBinary = YES;
-	}
+	// Apple Silicon only - no need for 32-bit binary forcing
 	
 	// *** FILES
 	
@@ -1242,13 +1232,8 @@ static NSArray* statusNames;
 	if (screenshotPath && [[NSFileManager defaultManager] fileExistsAtPath:screenshotPath])
 		[myMplayerTask setCurrentDirectoryPath:screenshotPath];
 	
-	// set launch path and params
-	if (force32bitBinary) {
-		[myMplayerTask setLaunchPath:@"/usr/bin/arch"];
-		[aParams insertObject:@"-i386" atIndex:0];
-		[aParams insertObject:myPathToPlayer atIndex:1];
-	} else
-		[myMplayerTask setLaunchPath:myPathToPlayer];
+	// set launch path
+	[myMplayerTask setLaunchPath:myPathToPlayer];
 	
 	// set launch arguments
 	[myMplayerTask setArguments:aParams];

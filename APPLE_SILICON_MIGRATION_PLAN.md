@@ -521,14 +521,18 @@ xcodebuild -configuration Release ARCHS=arm64
 - [ ] Update `ffmpeg/build` - arm64 only
 
 ### Source Code
-- [ ] `MPlayerInterface.m` - Remove 64-bit detection, 32-bit forcing
-- [ ] `BinaryBundle.m` - Update architecture list to arm64
-- [ ] `PreferencesController2.m` - Simplify compatibility check
-- [ ] `Preferences.h` - Remove MPEUse32bitBinaryon64bit
+- [x] `MPlayerInterface.m` - Remove 64-bit detection, 32-bit forcing
+- [x] `BinaryBundle.m` - Update architecture list to arm64
+- [x] `PreferencesController2.m` - Simplify compatibility check
+- [x] `Preferences.h` - Remove MPEUse32bitBinaryon64bit
+- [x] `Preferences.plist` - Remove MPEUse32bitBinaryon64bit default and restart requirement
 
 ### UI/Resources
-- [ ] Update Preferences.xib architecture display
-- [ ] Remove 32-bit binary preference UI
+- [x] Update Preferences.xib architecture display
+- [x] Remove 32-bit binary preference UI (checkbox removed)
+
+### Binary Bundles
+- [x] Update example.mpBinaries Info.plist with arm64 architecture
 
 ### Dependencies
 - [ ] Rebuild MPlayer/FFmpeg for arm64

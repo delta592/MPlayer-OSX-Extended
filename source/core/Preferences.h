@@ -96,7 +96,6 @@ extern NSString* const MPESubtitleScale;
 extern NSString* const MPESubtitleTextColor;
 extern NSString* const MPETextEncoding;
 extern NSString* const MPEUpdateBinaries;
-extern NSString* const MPEUse32bitBinaryon64bit;
 extern NSString* const MPEVideoEqualizerValues;
 extern NSString* const MPEVideoEqualizerEnabled;
 extern NSString* const MPEWindowOnTop;

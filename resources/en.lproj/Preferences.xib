@@ -1796,7 +1796,7 @@ DQ
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="651">
                         <font key="font" metaFont="system"/>
-                        <string key="title">Double click a binary to select it for playback. You can download and install additional ones with special features or for different architectures.</string>
+                        <string key="title">Double click a binary to select it for playback. You can download and install additional ones with special features.</string>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -1953,7 +1953,7 @@ DQ
                             <textField verticalHuggingPriority="750" id="1118">
                                 <rect key="frame" x="103" y="89" width="446" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="ppc, i386, x86_64" id="1119">
+                                <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="arm64" id="1119">
                                     <font key="font" metaFont="smallSystem"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1987,18 +1987,6 @@ DQ
                         </subviews>
                     </view>
                 </box>
-                <button id="1174">
-                    <rect key="frame" x="43" y="27" width="530" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="Use 32bit binary on 64bit computers when available (required for binary codecs)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1175">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="requireRestart:" target="44" id="1358"/>
-                        <binding destination="6" name="value" keyPath="values.MPEUse32bitBinaryon64bit" id="1177"/>
-                    </connections>
-                </button>
                 <button verticalHuggingPriority="750" id="680">
                     <rect key="frame" x="434" y="232" width="160" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>

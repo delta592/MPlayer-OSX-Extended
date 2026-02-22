@@ -477,42 +477,11 @@
 
 - (BOOL) binaryHasCompatibleArch:(BinaryBundle *)bundle
 {
-	const NXArchInfo *current_arch = NXGetLocalArchInfo();
-	
-	// Allow all arches if we fail to determine ours
-	if (!current_arch)
-		return YES;
-	
 	NSArray *binaryArches = [bundle executableArchitectureStrings];
-	
-	// Probably not a valid binary
-	if ([binaryArches count] == 0)
-		return NO;
-	
-	// extra 64bit check since CPU_TYPE_X86_64 doesn't seem to be very reliable
-	int is64bitCapable;
-	size_t len = sizeof(is64bitCapable);
-	if (sysctlbyname("hw.optional.x86_64",&is64bitCapable,&len,NULL,0))
-		is64bitCapable = NO;
-	
-	// x86_64 is able to run all (i386 and ppc through Rosetta)
-	if (current_arch->cputype == CPU_TYPE_X86_64
-		|| (current_arch->cputype == CPU_TYPE_I386 && is64bitCapable))
-		return YES;
-	// i386 is able to run i386 and ppc trough Rosetta
-	else if (current_arch->cputype == CPU_TYPE_I386 && ([binaryArches containsObject:@"i386"] 
-													   || [binaryArches containsObject:@"ppc64"]
-													   || [binaryArches containsObject:@"ppc"]))
-		return YES;
-	// ppc64 is able to run ppc
-	else if (current_arch->cputype == CPU_TYPE_POWERPC64 && ([binaryArches containsObject:@"ppc64"]
-															|| [binaryArches containsObject:@"ppc"]))
-		return YES;
-	// ppc
-	else if (current_arch->cputype == CPU_TYPE_POWERPC && [binaryArches containsObject:@"ppc"])
-		return YES;
-	
-	return NO;
+
+	// On Apple Silicon, only arm64 binaries are compatible
+	// (Rosetta 2 could run x86_64, but we're targeting arm64-only)
+	return [binaryArches containsObject:@"arm64"];
 }
 
 - (NSComparisonResult) compareBinaryVersion:(NSDictionary *)b1 toBinary:(NSDictionary*)b2
